@@ -54,6 +54,7 @@
 
 	aliases {
 		led0 = &user_led0;
+		led1 = &user_led1;
 		sw0 = &user_button0;
 		eeprom-0 = &eeprom;
 	};
