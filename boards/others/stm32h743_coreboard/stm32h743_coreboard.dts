@@ -1,0 +1,133 @@
+/*
+ * Copyright (c) 2026 Davi Alexandre Volcan <davi.volcan2@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <st/h7/stm32h743Xi.dtsi>
+#include <st/h7/stm32h743xihx-pinctrl.dtsi>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+	model = "STM32H743IIT6 Core Board";
+	compatible = "st,stm32h743_coreboard";
+
+	chosen {
+		zephyr,console = &usart1;
+		zephyr,shell-uart = &usart1;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		user_led0: led_0 {
+			gpios = <&gpiob 0 GPIO_ACTIVE_LOW>;
+			label = "Red led";
+		};
+
+		user_led1: led_1 {
+			gpios = <&gpiob 1 GPIO_ACTIVE_LOW>;
+			label = "Green led";
+		};
+
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+
+		user_button0: key0 {
+			label = "key0";
+			gpios = <&gpioa 1 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+			zephyr,code = <INPUT_KEY_0>;
+		};
+
+		user_button1: wk_up {
+			label = "wk_up";
+			gpios = <&gpioa 0 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+			zephyr,code = <INPUT_KEY_0>;
+		};
+
+	};
+
+	aliases {
+		led0 = &user_led0;
+		sw0 = &user_button0;
+		eeprom-0 = &eeprom;
+	};
+};
+
+&i2c2 {
+	status = "okay";
+	pinctrl-0 = <&i2c2_scl_ph4 &i2c2_sda_ph5>;
+	pinctrl-names = "default";
+
+	eeprom: eeprom@50 {
+		compatible = "atmel,at24";
+		reg = <0x50>;
+		size = <DT_SIZE_K(2)>;
+		pagesize = <8>;
+		address-width = <8>;
+		timeout = <5>;
+	};
+
+};
+
+&quadspi {
+	pinctrl-0 = <&quadspi_clk_pb2 &quadspi_bk1_ncs_pb6
+		     &quadspi_bk1_io0_pf8 &quadspi_bk1_io1_pf9
+		     &quadspi_bk1_io2_pf7 &quadspi_bk1_io3_pf6>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	w25q128jvsiq: qspi-nor-flash@0 {
+		compatible = "st,stm32-qspi-nor";
+		reg = <0>;
+		size = <DT_SIZE_M(128)>;
+		qspi-max-frequency = <133000000>;
+		cs-high-time = <7>;
+		status = "okay";
+	};
+};
+
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(25)>;
+	status = "okay";
+};
+
+&pll {
+	div-m = <5>;
+	mul-n = <192>;
+	div-p = <2>;
+	div-q = <4>;
+	div-r = <4>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&pll3 {
+	div-m = <5>;
+	mul-n = <192>;
+	div-p = <2>;
+	div-q = <20>;
+	div-r = <99>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(480)>;
+	d1cpre = <1>;
+	hpre = <2>;
+	d1ppre = <2>;
+	d2ppre1 = <2>;
+	d2ppre2 = <2>;
+	d3ppre = <2>;
+};
+
+&pwr {
+	power-supply = "ldo";
+};
