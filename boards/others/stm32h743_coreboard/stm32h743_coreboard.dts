@@ -163,11 +163,11 @@
 };
 
 &pll3 {
-	div-m = <5>;
-	mul-n = <192>;
+	div-m = <2>;
+	mul-n = <12>;
 	div-p = <2>;
-	div-q = <20>;
-	div-r = <99>;
+	div-q = <2>;
+	div-r = <15>;
 	clocks = <&clk_hse>;
 	status = "okay";
 };
